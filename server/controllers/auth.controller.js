@@ -107,23 +107,21 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  try{
-    res.cookie("jwt", "", {maxAge:0})
-    res.status(200).json({message:"Logged out"})
-  }catch(err){
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged out" });
+  } catch (err) {
     console.log("Error in logout.");
-    res.status(500).json({error:"Internal server error"})
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-export const getMe = async(req, res)=>{
-  try{  
-    
-    const user = await User.findById(req.user._id).select("-pasword")
-    
-    return res.status(200).json(user)    
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
 
-  }catch(err){
-    res.status(400).json({err:"User is not loggesd in"})
+    return res.status(200).json(user);
+  } catch (err) {
+    res.status(400).json({ err: "User is not loggesd in" });
   }
-}
+};
