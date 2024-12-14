@@ -59,26 +59,29 @@ export const followUnfollowUser = async (req, res) => {
 export const getSuggestedUser = async (req, res) => {
   try {
     const userId = req.user._id;
-    const userFollowedByMe = await User.findById(userId).select("following"); // this is my followed users array
+
+    // const userFollowedByMe = await User.findById(userId).select("following"); // this is my followed users array
+
+    const user = await User.findById(req.user._id);
 
     const users = await User.aggregate([
       {
         $match: {
-          _id: { $ne: userId },
+          _id: { $ne: userId, $nin: userTest.following },
         },
       },
       { $sample: { size: 10 } },
       { $project: { password: 0 } },
-    ]); // users without me. i dont want to see myself in suggested users.
-    const filteredUser = users.filter(
-      (user) => !userFollowedByMe.following.includes(user._id)
-    );
-    const suggestedUser = filteredUser.slice(0, 4);
+    ]);
+     // users without me. i dont want to see myself in suggested users.
+    /*  const filteredUser = users.filter(
+      (user) => !req.user.following.includes(user._id)
+    );*/
 
-    // suggestedUser.forEach((user) => (user.password = null));
-    console.log(suggestedUser);
-
+    const suggestedUser = users.slice(0, 4);
+    
     res.status(200).json(suggestedUser);
+   
   } catch (err) {
     res.status(400).json({ err: err.measseg });
   }
@@ -88,12 +91,16 @@ export const updateUser = async (req, res) => {
   const { fullName, email, userName, currentPassword, newPassword, bio, link } =
     req.body;
   let { profileImg, coverImg } = req.body;
-  const userId = req.user._id;
+
+  let user = req.user;
+
   try {
-    let user = await User.findById(userId);
+    /*  let user = await User.findById(userId);
     if (!user) {
       return res.status(400).json("User not exist");
     }
+   console.log(user);*/
+
     if (
       (!currentPassword && newPassword) ||
       (!newPassword && currentPassword)
