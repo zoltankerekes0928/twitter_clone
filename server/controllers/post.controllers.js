@@ -179,7 +179,7 @@ export const getFollowingPosts = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    const feedPost = await Post.find({ user: { $nin: user.following } })
+    const feedPost = await Post.find({ user: { $in: user.following } })
       .sort({ createdAt: -1 })
       .populate({
         path: "user",
