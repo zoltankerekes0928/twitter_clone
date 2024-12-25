@@ -83,7 +83,7 @@ export const getSuggestedUser = async (req, res) => {
     res.status(200).json(suggestedUser);
    
   } catch (err) {
-    res.status(400).json({ err: err.measseg });
+    res.status(400).json({ err: "Internal server error" });
   }
 };
 
