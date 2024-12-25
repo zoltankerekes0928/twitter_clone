@@ -20,7 +20,7 @@ function App() {
         if (!response.ok) {
           throw new Error(data.message || "Something went wrong");
         }
-        console.log("auth user here:", data);
+      //  console.log("auth user here:", data);
         return data;
       } catch (error) {
         console.log(error);

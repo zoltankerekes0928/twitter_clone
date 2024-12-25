@@ -23,8 +23,6 @@ const Posts = ({ feedType }) => {
 			try{
 			const response = await fetch(POST_ENDPOINT)
 			const data = await response.json()
-console.log(data);
-
 			if(!response.ok){
 				throw new Error(data.message || "Something went wrong")
 			}
@@ -33,7 +31,6 @@ console.log(data);
 		catch(error){
 			console.log(error);
 			throw new Error(error)
-			
 		}
 		}
 	})
