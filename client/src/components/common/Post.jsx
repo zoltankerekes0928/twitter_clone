@@ -12,10 +12,12 @@ import LoadingSpinner from "./LoadingSpinner";
 const Post = ({ post }) => {
   const [comment, setComment] = useState("");
   const postOwner = post.user;
-  const isLiked = false;
   const queryClient = useQueryClient();
 
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const isLiked = post.likes.includes(authUser._id);
+
+  console.log(isLiked);
 
   const isMyPost = authUser._id === post.user._id;
 
@@ -45,6 +47,27 @@ const Post = ({ post }) => {
     },
   });
 
+  const { mutate: likeUnlikeMutation, isPending: isLiking } = useMutation({
+    mutationFn: async (id) => {
+      const response = await fetch(`/api/posts/like/${id}`, {
+        method: "POST",
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+      return data;
+    },
+    onError: (error) => {
+      toast.error(error.err);
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
+
   const handleDeletePost = () => {
     delPostMutation(post._id);
   };
@@ -53,7 +76,9 @@ const Post = ({ post }) => {
     e.preventDefault();
   };
 
-  const handleLikePost = () => {};
+  const handleLikePost = () => {
+    likeUnlikeMutation(post._id);
+  };
 
   return (
     <>
@@ -146,7 +171,7 @@ const Post = ({ post }) => {
                               {comment.user.fullName}
                             </span>
                             <span className="text-gray-700 text-sm">
-                              @{comment.user.username}
+                              @{comment.user.userName}
                             </span>
                           </div>
                           <div className="text-sm">{comment.text}</div>
@@ -165,11 +190,7 @@ const Post = ({ post }) => {
                       onChange={(e) => setComment(e.target.value)}
                     />
                     <button className="btn btn-primary rounded-full btn-sm text-white px-4">
-                      {isCommenting ? (
-                        <span className="loading loading-spinner loading-md"></span>
-                      ) : (
-                        "Post"
-                      )}
+                      {isCommenting ? <LoadingSpinner size="md" /> : "Post"}
                     </button>
                   </form>
                 </div>
@@ -187,10 +208,11 @@ const Post = ({ post }) => {
                 className="flex gap-1 items-center group cursor-pointer"
                 onClick={handleLikePost}
               >
-                {!isLiked && (
+                {isLiking && <LoadingSpinner size="sm" />}
+                {!isLiked && !isLiking && (
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
                 )}
-                {isLiked && (
+                {isLiked && !isLiking && (
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
                 )}
 

@@ -54,7 +54,7 @@ useEffect(()=>{
       )}
       {!isLoading && posts && (
         <div>
-          {posts.map((post) => (
+          {posts?.map((post) => (
             <Post key={post._id} post={post} />
           ))}
         </div>
