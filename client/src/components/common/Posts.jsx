@@ -18,14 +18,15 @@ const Posts = ({ feedType }) => {
 	const POST_ENDPOINT = getPostEndpoint()
 
 	const {data: posts, isLoading, refetch} = useQuery({
-		queryKey: ["posts"],
+    
+    queryKey: ["posts"],
 		queryFn: async()=>{
-			try{
-			const response = await fetch(POST_ENDPOINT)
-			const data = await response.json()
-			if(!response.ok){
-				throw new Error(data.message || "Something went wrong")
-			}
+      try{
+        const response = await fetch(POST_ENDPOINT)
+        const data = await response.json()
+        if(!response.ok){
+          throw new Error(data.message || "Something went wrong")
+        }
 			return data
 		}
 		catch(error){

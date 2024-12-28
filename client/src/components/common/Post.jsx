@@ -14,10 +14,10 @@ const Post = ({ post }) => {
   const [comment, setComment] = useState("");
   const postOwner = post.user;
   const queryClient = useQueryClient();
-  const isMyPost = authUser._id === post.user._id;
   const formattedDate = formatPostDate(post.createdAt);
-  const isLiked = post.likes.includes(authUser._id);
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const isLiked = post.likes.includes(authUser._id);
+  const isMyPost = authUser._id === post.user._id;
 
   const { mutate: delPostMutation, isPending } = useMutation({
     mutationFn: async (id) => {
