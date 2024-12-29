@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModal from "./EditProfileModal";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/db/formattedDateHelper.js";
 
 import { POSTS } from "../../utils/db/dummy";
@@ -23,7 +23,6 @@ const ProfilePage = () => {
   const profileImgRef = useRef(null);
   const {username} = useParams();
   const isMyProfile = true;
-  const queryClient = useQueryClient()
 
   const {
     data: user,
@@ -50,10 +49,6 @@ const ProfilePage = () => {
   useEffect(() => {
     refetch();
   }, [username, refetch]);
-
-  useEffect(()=>{
-    queryClient.invalidateQueries({queryKey:["posts"]})
-  }, [user?._id, queryClient])
 
 
 

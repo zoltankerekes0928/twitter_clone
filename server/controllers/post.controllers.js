@@ -167,7 +167,7 @@ export const getLikedPosts = async (req, res) => {
       });
 
     if (posts.length === 0) {
-      return res.status(404).json({ message: "No liked post" });
+      return res.status(200).json([]);
     }
     return res.status(200).json(posts);
   } catch (err) {
