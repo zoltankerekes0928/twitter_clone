@@ -6,7 +6,7 @@ const userFollow = () => {
 
   const {
     mutate: userFollowMutation,
-    isLoading,
+    isPending,
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useMutation({
     mutationFn: async (id) => {
@@ -21,6 +21,7 @@ const userFollow = () => {
     },
     onError: (error) => {
       console.log(error);
+      throw new Error(error)
     },
     onSuccess: () => {
       Promise.all([
@@ -30,7 +31,7 @@ const userFollow = () => {
     },
   });
 
-  return { userFollowMutation, isLoading };
+  return { userFollowMutation, isPending };
 };
 
 export default userFollow;
