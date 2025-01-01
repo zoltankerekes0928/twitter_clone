@@ -3,7 +3,7 @@ import XSvg from "../svgs/X";
 import { MdHomeFilled } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
-import { Link, Navigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
