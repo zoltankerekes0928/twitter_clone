@@ -3,7 +3,7 @@ import XSvg from "../svgs/X";
 import { MdHomeFilled } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -30,13 +30,11 @@ const Sidebar = () => {
     },
   });
 
-  const handleLogOut = (e) => {
-    e.preventDefault();
+  const handleLogOut = () => {
     logOutMutation();
   };
 
-
-  const {data:authUser } = useQuery({queryKey: ["authUser"]})
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
@@ -91,10 +89,10 @@ const Sidebar = () => {
                 </p>
                 <p className="text-slate-500 text-sm">@{authUser?.userName}</p>
               </div>
-              <BiLogOut
-                className="w-5 h-5 cursor-pointer"
-                onClick={handleLogOut}
-              />
+
+              <Link onClick={handleLogOut} to={"/login"}>
+                <BiLogOut className="w-5 h-5 cursor-pointer" />
+              </Link>
             </div>
           </Link>
         )}
