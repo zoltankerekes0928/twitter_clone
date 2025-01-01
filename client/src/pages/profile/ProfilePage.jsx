@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { toast } from "react-hot-toast";
-
+import useProfileUpdate from "../../components/hooks/useEditProfileHelper.js";
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModal from "./EditProfileModal";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/db/formattedDateHelper.js";
 import userFollow from "../../components/hooks/userFollowHelper";
 
@@ -26,7 +25,7 @@ const ProfilePage = () => {
   const { username } = useParams();
   const { userFollowMutation, isPending } = userFollow();
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-  const queryClient = useQueryClient();
+  const { editProfileMutation, profileEditing } = useProfileUpdate();
 
   const {
     data: user,
@@ -39,7 +38,6 @@ const ProfilePage = () => {
       try {
         const response = await fetch(`/api/users/profile/${username}`);
         const data = await response.json();
-
         if (!response.ok) {
           throw new Error(data.message);
         }
@@ -66,34 +64,6 @@ const ProfilePage = () => {
     }
   };
 
-  const { mutate: updateProfileImg, isPending: updatingProfileImg } =
-    useMutation({
-      mutationFn: async () => {
-        const response = await fetch("/api/users/update", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ profileImg, coverImg }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data);
-        return data;
-      },
-      onError: (error) => {
-        toast.error("Profile not updated")
-        console.log(error.err);
-      },
-      onSuccess: () => {
-        toast.success("Profile Updated");
-        Promise.all([
-          queryClient.invalidateQueries({ queryKey: ["authUser"] }),
-          queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
-        ]);
-      },onSettled: ()=>{
-        setCoverImg(null)
-        setProfileImg(null)
-      }
-    });
-
   const isMyProfile = authUser?._id === user?._id;
   const amImFollowing = authUser?.following.includes(user?._id);
 
@@ -106,13 +76,20 @@ const ProfilePage = () => {
         return "Follow";
     }
   };
+
+  const handelImgMutation = async () => {
+    await editProfileMutation({ coverImg, profileImg });
+
+    setCoverImg(null);
+    setProfileImg(null);
+  };
+
   /*
  Follow/Unfollow btn loginc whithout function
    {isPending && "Loading.."}
    {!isPending && amImFollowing && "Unfollow"}
    {!isPending && !amImFollowing && "Follow"}
 */
-
   return (
     <>
       <div className="flex-[4_4_0]  border-r border-gray-700 min-h-screen ">
@@ -199,9 +176,9 @@ const ProfilePage = () => {
                 {(coverImg || profileImg) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                    onClick={updateProfileImg}
+                    onClick={handelImgMutation}
                   >
-                    {updatingProfileImg ? "Updating..." : "Update"}
+                    {profileEditing ? "Updating..." : "Update"}
                   </button>
                 )}
               </div>

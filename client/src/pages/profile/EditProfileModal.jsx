@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import useProfileUpdate from "../../components/hooks/useEditProfileHelper.js";
 
 const EditProfileModal = () => {
+  const { editProfileMutation, profileEditing } = useProfileUpdate()
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  
   const [formData, setFormData] = useState({
     fullName: "",
     userName: "",
@@ -15,54 +18,9 @@ const EditProfileModal = () => {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log(formData);
+    
   };
-  const queryClient = useQueryClient();
-	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-  
-
-  const { mutate: editProfileMutation, isPending } = useMutation({
-    mutationFn: async ({
-      fullName,
-      userName,
-      email,
-      bio,
-      link,
-      newPassword,
-      currentPassword,
-    }) => {
-      const response = await fetch("/api/users/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName,
-          userName,
-          email,
-          bio,
-          link,
-          newPassword,
-          currentPassword,
-        }),
-      });
-      const data = response.json();
-
-      if (!response.ok) {
-        throw new Error(data);
-      }
-      return data;
-    },
-    onError: (error) => {
-      toast.error(error);
-    },
-    onSuccess: () => {
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["authUser"] }),
-        queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
-      ]);
-      toast.success("Profile Updated");
-    },
-  });
-
-  console.log(isPending);
 
   const handleUpdate = () => {
     editProfileMutation(formData);
@@ -72,7 +30,7 @@ const EditProfileModal = () => {
     if (authUser) {
       setFormData({
         fullName: authUser.fullName,
-        userName: authUser.username,
+        userName: authUser.userName,
         email: authUser.email,
         bio: authUser.bio,
         link: authUser.link,
@@ -164,7 +122,7 @@ const EditProfileModal = () => {
               onChange={handleInputChange}
             />
             <button className="btn btn-primary rounded-full btn-sm text-white">
-              {isPending ? "Updating data..." : "Update"}
+              {profileEditing ? "Updating data..." : "Update"}
             </button>
           </form>
         </div>
